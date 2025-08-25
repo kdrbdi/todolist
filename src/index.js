@@ -1,4 +1,5 @@
 import { v4 as uuidv4 } from "uuid";
+import { formatDistance } from "date-fns";
 
 class Task {
   constructor(title, description, dueDate, priority, notes, checkList) {
@@ -10,9 +11,10 @@ class Task {
     this.notes = notes;
     this.checkList = [];
     this.state = "undone";
+    this.dateAdded = new Date();
   }
-  markTaskDone(task) {
-    task.state = "done";
+  markTaskDone() {
+    this.state = "done";
   }
   setDescription(description) {
     this.description = description;
@@ -62,3 +64,12 @@ console.log(inbox);
 inbox.removeTask(task1);
 console.log("Deleting...");
 console.log(inbox);
+
+task2.setPriority("High");
+task2.markTaskDone();
+console.log(inbox);
+console.log(task2);
+const dateAdded = formatDistance(task2.dateAdded, new Date(), {
+  addSuffix: true,
+});
+console.log("Task2 was added " + dateAdded);
