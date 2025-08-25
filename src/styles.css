@@ -77,8 +77,40 @@ h6 {
 /* ----- End off CSS Reset by Josh W. Comeau ------  */
 /* https://www.joshwcomeau.com/css/custom-css-reset/ */
 
+* {
+  outline: 1px solid red;
+}
+
+:root {
+  font-family: "Helvetica", sans-serif;
+}
+
+body {
+  display: flex;
+}
+
 #sidebar {
-  width: 30vw;
+  width: 20vw;
   min-height: 100vh;
   background-color: aqua;
+  padding: 1rem 0.4rem 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.icon-logo {
+  width: 1rem;
+  height: auto;
+  background: url("./fire-circle.svg");
+}
+
+#sidebar .project-title {
+  padding: 0.5rem 1rem;
+  text-transform: capitalize;
+}
+
+#container {
+  width: 100%;
+  padding: 4rem 4rem;
 }

@@ -28,6 +28,7 @@
   },
   "dependencies": {
     "date-fns": "^4.1.0",
+    "material-icons": "^1.13.14",
     "uuid": "^11.1.0"
   }
 }

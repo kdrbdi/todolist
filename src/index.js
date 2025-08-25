@@ -1,3 +1,4 @@
+import "./styles.css";
 import { v4 as uuidv4 } from "uuid";
 import { formatDistance } from "date-fns";
 
@@ -69,12 +70,20 @@ class Sidebar {
   }
   createLogo() {
     const logo = document.createElement("div");
-    logo.textContent = "2dos";
+    logo.classList.add("logo");
+    const logoTitle = document.createElement("div");
+    const logoIcon = document.createElement("div");
+    logoTitle.textContent = "2dos";
+    logoIcon.classList.add("icon-logo");
+    logo.appendChild(logoIcon);
+    logo.appendChild(logoTitle);
+
     this.sidebar.appendChild(logo);
   }
   createProjects(projectList) {
     projectList.getProjects().forEach((element) => {
       const proj = document.createElement("div");
+      proj.classList.add("project-title");
       proj.textContent = element.title;
       this.sidebar.appendChild(proj);
     });
@@ -86,16 +95,21 @@ class Sidebar {
 
 class TodosView {
   constructor() {
-    this.container = document.querySelector("#container");
+    this.container = document.createElement("div");
+    this.container.setAttribute("id", "container");
   }
   displayTodoInline(todolist) {
-    // this.container.innerHTML = "";
+    // If container already exists, clear it.
+    if (document.querySelector("#container")) {
+      document.querySelector("#container").innerHTML = "";
+    }
     todolist.forEach((element) => {
       const task = document.createElement("div");
       const taskTitle = document.createElement("div");
       taskTitle.textContent = element.title;
       task.appendChild(taskTitle);
       this.container.appendChild(task);
+      document.body.appendChild(this.container);
     });
   }
 }
@@ -109,9 +123,23 @@ const week = new Project("this week");
 const month = new Project("this month");
 projects.addProject(inbox, home, work, week, month);
 
+const task1 = new Task("Do laundry");
+const task2 = new Task("Work-out");
+inbox.addTask(task1);
+inbox.addTask(task2);
+
 const displaySidebar = (() => {
   const sidebar = new Sidebar();
   sidebar.createLogo();
   sidebar.createProjects(projects);
   document.body.appendChild(sidebar.getSidebar());
 })();
+
+const displayContainer = (() => {})();
+
+const inboxView = new TodosView();
+
+document.addEventListener(
+  "DOMContentLoaded",
+  inboxView.displayTodoInline(inbox.tasks)
+);
