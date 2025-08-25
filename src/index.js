@@ -10,11 +10,11 @@ class Task {
     this.priority = priority;
     this.notes = notes;
     this.checkList = [];
-    this.state = "undone";
+    this.done = false;
     this.dateAdded = new Date();
   }
-  markTaskDone() {
-    this.state = "done";
+  toggleDone() {
+    this.done = !this.done;
   }
   setDescription(description) {
     this.description = description;
@@ -28,16 +28,16 @@ class Task {
   setNotes(notes) {
     this.notes = notes;
   }
-  //   addCheckListItem(item) {
-  //     this.checkList.push(item)
-  //   }
-  //   checkCheckListItem(item) {
-  //     this.checkList.
-  //   }
+  // TODO: checkList methods
+
+  getDone() {
+    return this.done;
+  }
 }
 
 class Project {
   constructor(title, tasks = []) {
+    this.id = uuidv4();
     this.title = title;
     this.tasks = tasks;
   }
@@ -49,27 +49,69 @@ class Project {
   }
 }
 
+class ProjectList {
+  #projects = [];
+  getProjects() {
+    return this.#projects;
+  }
+  addProject(...project) {
+    this.#projects.push(...project);
+  }
+  removeProject(project) {
+    this.#projects = this.#projects.filter((item) => item.id !== project.id);
+  }
+}
+
+class Sidebar {
+  constructor() {
+    this.sidebar = document.createElement("div");
+    this.sidebar.setAttribute("id", "sidebar");
+  }
+  createLogo() {
+    const logo = document.createElement("div");
+    logo.textContent = "2dos";
+    this.sidebar.appendChild(logo);
+  }
+  createProjects(projectList) {
+    projectList.getProjects().forEach((element) => {
+      const proj = document.createElement("div");
+      proj.textContent = element.title;
+      this.sidebar.appendChild(proj);
+    });
+  }
+  getSidebar() {
+    return this.sidebar;
+  }
+}
+
+class TodosView {
+  constructor() {
+    this.container = document.querySelector("#container");
+  }
+  displayTodoInline(todolist) {
+    // this.container.innerHTML = "";
+    todolist.forEach((element) => {
+      const task = document.createElement("div");
+      const taskTitle = document.createElement("div");
+      taskTitle.textContent = element.title;
+      task.appendChild(taskTitle);
+      this.container.appendChild(task);
+    });
+  }
+}
+
+// Sidebar menu
+const projects = new ProjectList();
 const inbox = new Project("inbox");
-console.log(inbox);
+const home = new Project("home");
+const work = new Project("work");
+const week = new Project("this week");
+const month = new Project("this month");
+projects.addProject(inbox, home, work, week, month);
 
-const task1 = new Task("Do the laundry");
-const task2 = new Task("Relax");
-console.log(task1);
-console.log(task2);
-
-inbox.addTask(task1);
-inbox.addTask(task2);
-console.log(inbox);
-
-inbox.removeTask(task1);
-console.log("Deleting...");
-console.log(inbox);
-
-task2.setPriority("High");
-task2.markTaskDone();
-console.log(inbox);
-console.log(task2);
-const dateAdded = formatDistance(task2.dateAdded, new Date(), {
-  addSuffix: true,
-});
-console.log("Task2 was added " + dateAdded);
+const displaySidebar = (() => {
+  const sidebar = new Sidebar();
+  sidebar.createLogo();
+  sidebar.createProjects(projects);
+  document.body.appendChild(sidebar.getSidebar());
+})();
