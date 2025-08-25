@@ -2,6 +2,9 @@ import "./styles.css";
 import { v4 as uuidv4 } from "uuid";
 import { formatDistance } from "date-fns";
 
+const container = document.createElement("div");
+container.setAttribute("id", "container");
+
 class Task {
   constructor(title, description, dueDate, priority, notes, checkList) {
     this.id = uuidv4();
@@ -82,8 +85,9 @@ class Sidebar {
   }
   createProjects(projectList) {
     projectList.getProjects().forEach((element) => {
-      const proj = document.createElement("div");
+      const proj = document.createElement("button");
       proj.classList.add("project-title");
+      proj.setAttribute("data-attribute", element.id);
       proj.textContent = element.title;
       this.sidebar.appendChild(proj);
     });
@@ -99,12 +103,10 @@ class ProjectView {
     this.tasks = project.tasks;
   }
   displayProject() {
-    const container = document.createElement("div");
-    container.setAttribute("id", "container");
+    container.innerHTML = "";
     const projectTitle = document.createElement("div");
     projectTitle.textContent = this.title;
     container.appendChild(projectTitle);
-
     const todos = new TodosView();
     const todosDisplay = todos.displayTodosInline(this.tasks);
     container.appendChild(todosDisplay);
@@ -147,6 +149,11 @@ const task2 = new Task("Work-out");
 inbox.addTask(task1);
 inbox.addTask(task2);
 
+const task3 = new Task("Do X");
+const task4 = new Task("Do Y");
+home.addTask(task3);
+home.addTask(task4);
+
 const displaySidebar = (() => {
   const sidebar = new Sidebar();
   sidebar.createLogo();
@@ -154,5 +161,13 @@ const displaySidebar = (() => {
   document.body.appendChild(sidebar.getSidebar());
 })();
 
-const inboxView = new ProjectView(inbox);
-inboxView.displayProject();
+// const inboxView = new ProjectView(inbox);
+// inboxView.displayProject();
+
+document.querySelector("#sidebar").addEventListener("click", (e) => {
+  const project = projects
+    .getProjects()
+    .filter((item) => item.id == e.target.getAttribute("data-attribute"));
+  const view = new ProjectView(...project);
+  view.displayProject();
+});
