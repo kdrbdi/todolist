@@ -112,5 +112,9 @@ body {
 
 #container {
   width: 100%;
-  padding: 4rem 4rem;
+  padding: 1rem 2rem;
+}
+
+#container-tasks {
+  padding: 1rem;
 }

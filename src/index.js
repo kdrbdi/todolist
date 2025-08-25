@@ -93,28 +93,47 @@ class Sidebar {
   }
 }
 
+class ProjectView {
+  constructor(project) {
+    this.title = project.title;
+    this.tasks = project.tasks;
+  }
+  displayProject() {
+    const container = document.createElement("div");
+    container.setAttribute("id", "container");
+    const projectTitle = document.createElement("div");
+    projectTitle.textContent = this.title;
+    container.appendChild(projectTitle);
+
+    const todos = new TodosView();
+    const todosDisplay = todos.displayTodosInline(this.tasks);
+    container.appendChild(todosDisplay);
+    document.body.appendChild(container);
+  }
+}
+
 class TodosView {
   constructor() {
-    this.container = document.createElement("div");
-    this.container.setAttribute("id", "container");
+    this.tasksContainer = document.createElement("div");
+    this.tasksContainer.setAttribute("id", "container-tasks");
   }
-  displayTodoInline(todolist) {
+  displayTodosInline(todolist) {
     // If container already exists, clear it.
-    if (document.querySelector("#container")) {
-      document.querySelector("#container").innerHTML = "";
+    if (document.querySelector("#container-tasks")) {
+      document.querySelector("#container-tasks").innerHTML = "";
     }
     todolist.forEach((element) => {
       const task = document.createElement("div");
       const taskTitle = document.createElement("div");
       taskTitle.textContent = element.title;
       task.appendChild(taskTitle);
-      this.container.appendChild(task);
-      document.body.appendChild(this.container);
+      this.tasksContainer.appendChild(task);
     });
+    return this.tasksContainer;
   }
 }
 
-// Sidebar menu
+// Sidebar
 const projects = new ProjectList();
 const inbox = new Project("inbox");
 const home = new Project("home");
@@ -135,11 +154,5 @@ const displaySidebar = (() => {
   document.body.appendChild(sidebar.getSidebar());
 })();
 
-const displayContainer = (() => {})();
-
-const inboxView = new TodosView();
-
-document.addEventListener(
-  "DOMContentLoaded",
-  inboxView.displayTodoInline(inbox.tasks)
-);
+const inboxView = new ProjectView(inbox);
+inboxView.displayProject();
