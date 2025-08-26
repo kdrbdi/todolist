@@ -83,6 +83,10 @@ h6 {
 
 :root {
   font-family: "Helvetica", sans-serif;
+  --bg-clr-primary: #dcdcdc6c;
+  --bg-clr-secondary: #f3f2ec;
+  --link-clr-primary: #37353e;
+  --link-clr-secondary: #37353ee3;
 }
 
 body {
@@ -92,22 +96,43 @@ body {
 #sidebar {
   width: 20vw;
   min-height: 100vh;
-  background-color: aqua;
+  background-color: var(--bg-clr-primary);
   padding: 1rem 0.4rem 2rem;
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+}
+
+#sidebar button {
+  background: none;
+  color: inherit;
+  border: none;
+  padding: 0;
+  font: inherit;
+  cursor: pointer;
+  outline: inherit;
+}
+#sidebar button.project-title {
+  color: var(--link-clr-secondary);
+  padding: 0.5rem 1rem;
+  text-transform: capitalize;
+}
+
+#sidebar button.project-title:hover,
+#sidebar button.current-tab {
+  color: var(--link-clr-primary);
+  font-weight: 600;
+}
+
+.logo {
+  display: flex;
 }
 
 .icon-logo {
-  width: 1rem;
-  height: auto;
-  background: url("./fire-circle.svg");
-}
-
-#sidebar .project-title {
-  padding: 0.5rem 1rem;
-  text-transform: capitalize;
+  width: 2.5rem;
+  height: 2.5rem;
+  background-image: url("./fire-circle.svg");
+  background-repeat: no-repeat;
+  background-size: contain;
 }
 
 #container {

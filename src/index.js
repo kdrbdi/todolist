@@ -154,6 +154,11 @@ const task4 = new Task("Do Y");
 home.addTask(task3);
 home.addTask(task4);
 
+const task5 = new Task("Do A");
+const task6 = new Task("Do B");
+work.addTask(task5);
+work.addTask(task6);
+
 const displaySidebar = (() => {
   const sidebar = new Sidebar();
   sidebar.createLogo();
@@ -165,9 +170,20 @@ const displaySidebar = (() => {
 // inboxView.displayProject();
 
 document.querySelector("#sidebar").addEventListener("click", (e) => {
-  const project = projects
-    .getProjects()
-    .filter((item) => item.id == e.target.getAttribute("data-attribute"));
-  const view = new ProjectView(...project);
-  view.displayProject();
+  if (e.target.classList.contains("project-title")) {
+    // Mark tab as active (for styling) and remove class from
+    // other buttons
+    const tabs = document.querySelectorAll(".project-title");
+    tabs.forEach((item) => {
+      if (item.classList.contains("current-tab")) {
+        item.classList.toggle("current-tab");
+      }
+    });
+    e.target.classList.toggle("current-tab");
+    const project = projects
+      .getProjects()
+      .filter((item) => item.id == e.target.getAttribute("data-attribute"));
+    const view = new ProjectView(...project);
+    view.displayProject();
+  }
 });
