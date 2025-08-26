@@ -229,6 +229,19 @@ button.project-title,
   display: flex;
   gap: 1rem;
 }
+
+.task-controls * {
+  background: none; /* Removes background color/image */
+  border: none; /* Removes border */
+  padding: 0; /* Removes default padding */
+  margin: 0; /* Removes default margin */
+  font: inherit; /* Inherits font styles from parent */
+  color: inherit; /* Inherits text color from parent */
+  cursor: pointer; /* Ensures cursor remains a pointer */
+  -webkit-appearance: none; /* For Webkit browsers */
+  -moz-appearance: none; /* For Mozilla browsers */
+  appearance: none; /* Standard property for removing default button appearance */
+}
 .task .task-check,
 .task .task-delete {
   fill: rgba(0, 0, 0, 0.75);
@@ -243,4 +256,8 @@ button.project-title,
 
 .task .task-delete:hover {
   fill: red;
+}
+
+svg {
+  pointer-events: none;
 }

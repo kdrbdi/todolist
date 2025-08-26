@@ -32,6 +32,9 @@ class Task {
   setNotes(notes) {
     this.notes = notes;
   }
+  getId() {
+    return this.id;
+  }
   getDone() {
     return this.done;
   }
@@ -62,8 +65,8 @@ class Project {
   addTask(task) {
     this.tasks.push(task);
   }
-  removeTask(task) {
-    this.tasks = this.tasks.filter((item) => item.id !== task.id);
+  removeTask(id) {
+    this.tasks = this.tasks.filter((item) => item.id !== id);
   }
 }
 
@@ -71,6 +74,9 @@ class ProjectList {
   #projects = [];
   getProjects() {
     return this.#projects;
+  }
+  getProject(id) {
+    return this.#projects.find((item) => item.id == id);
   }
   addProject(...project) {
     this.#projects.push(...project);
@@ -122,6 +128,7 @@ class Sidebar {
 
 class ProjectView {
   constructor(project) {
+    this.id = project.id;
     this.title = project.title;
     this.tasks = project.tasks;
   }
@@ -152,19 +159,22 @@ class TodosView {
       const task = document.createElement("div");
       const taskTitle = document.createElement("div");
       const taskControls = document.createElement("div");
-      const taskCheck = document.createElement("div");
-      const taskDelete = document.createElement("div");
+      const taskCheck = document.createElement("button");
+      const taskDelete = document.createElement("button");
 
       taskTitle.textContent = element.getTitle();
       task.classList.add("task");
-      taskCheck.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" class="task-check" viewBox="0 0 24 24"><title>check-bold</title><path d="M9,20.42L2.79,14.21L5.62,11.38L9,14.77L18.88,4.88L21.71,7.71L9,20.42Z" /></svg>`;
-      taskDelete.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" class="task-delete" viewBox="0 0 24 24"><title>delete</title><path d="M19,4H15.5L14.5,3H9.5L8.5,4H5V6H19M6,19A2,2 0 0,0 8,21H16A2,2 0 0,0 18,19V7H6V19Z" /></svg>`;
+      taskCheck.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><title>check-bold</title><path d="M9,20.42L2.79,14.21L5.62,11.38L9,14.77L18.88,4.88L21.71,7.71L9,20.42Z" /></svg>`;
+      taskDelete.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><title>delete</title><path d="M19,4H15.5L14.5,3H9.5L8.5,4H5V6H19M6,19A2,2 0 0,0 8,21H16A2,2 0 0,0 18,19V7H6V19Z" /></svg>`;
+      taskCheck.classList.add("task-check");
+      taskDelete.classList.add("task-delete");
 
       taskControls.classList.add("task-controls");
       taskControls.appendChild(taskCheck);
       taskControls.appendChild(taskDelete);
       task.appendChild(taskTitle);
       task.appendChild(taskControls);
+      task.setAttribute("data-attribute", `${element.getId()}`);
       this.tasksContainer.appendChild(task);
     });
     return this.tasksContainer;
@@ -203,22 +213,52 @@ const displaySidebar = (() => {
   document.body.appendChild(sidebar.getSidebar());
 })();
 
-// Sidebar/Projects Handler
-document.querySelector("#sidebar").addEventListener("click", (e) => {
-  if (e.target.classList.contains("project-title")) {
-    // Mark tab as active (for styling) and remove class from
-    // other buttons
-    const tabs = document.querySelectorAll(".project-title");
-    tabs.forEach((item) => {
-      if (item.classList.contains("current-tab")) {
-        item.classList.toggle("current-tab");
+// Render default project on load
+const defaultProject = inbox;
+document.addEventListener("DOMContentLoaded", () => {
+  let view = new ProjectView(defaultProject);
+  view.displayProject();
+  let currentProject = defaultProject;
+
+  // Sidebar/Projects Handler
+  document.querySelector("#sidebar").addEventListener("click", (e) => {
+    if (e.target.classList.contains("project-title")) {
+      // Mark tab as active (for styling) and remove class from
+      // other buttons
+      const tabs = document.querySelectorAll(".project-title");
+      tabs.forEach((item) => {
+        if (item.classList.contains("current-tab")) {
+          item.classList.toggle("current-tab");
+        }
+      });
+      e.target.classList.toggle("current-tab");
+      const project = projects
+        .getProjects()
+        .find((item) => item.id == e.target.getAttribute("data-attribute"));
+      currentProject = project;
+      console.log("current project", project);
+      const view = new ProjectView(project);
+      view.displayProject();
+    }
+  });
+
+  // Task controls handler
+  document.body.addEventListener("click", (e) => {
+    console.log("event fired", e.target);
+
+    if (e.target.closest(".task-controls")) {
+      // Detect current task
+      const taskId =
+        e.target.parentNode.parentNode.getAttribute("data-attribute");
+      // Handle marking tasks as DONE
+      if (e.target.classList.contains("task-delete")) {
+        e.preventDefault();
+        currentProject.removeTask(taskId);
+
+        // Update Display
+        view = new ProjectView(currentProject);
+        view.displayProject();
       }
-    });
-    e.target.classList.toggle("current-tab");
-    const project = projects
-      .getProjects()
-      .filter((item) => item.id == e.target.getAttribute("data-attribute"));
-    const view = new ProjectView(...project);
-    view.displayProject();
-  }
+    }
+  });
 });
