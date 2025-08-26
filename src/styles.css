@@ -275,3 +275,10 @@ svg {
     fill: green;
   }
 }
+
+.date-added {
+  margin-left: auto;
+  font-size: 0.75rem;
+  font-weight: 300;
+  padding: 0 0.5rem;
+}

@@ -1,6 +1,6 @@
 import "./styles.css";
 import { v4 as uuidv4 } from "uuid";
-import { add, formatDistance } from "date-fns";
+import { add, formatDistanceToNowStrict } from "date-fns";
 
 const container = document.createElement("div");
 container.setAttribute("id", "container");
@@ -52,6 +52,9 @@ class Task {
   }
   getNotes() {
     return this.notes;
+  }
+  getDateAdded() {
+    return this.dateAdded;
   }
   // TODO: checkList methods
 }
@@ -140,9 +143,11 @@ class ProjectView {
     const projectTitle = document.createElement("div");
     projectTitle.classList.add("view-title");
     projectTitle.textContent = this.title;
-    container.appendChild(projectTitle);
+
     const todos = new TodosView();
     const todosDisplay = todos.displayTodosInline(this.tasks);
+
+    container.appendChild(projectTitle);
     container.appendChild(todosDisplay);
     document.body.appendChild(container);
   }
@@ -164,6 +169,7 @@ class TodosView {
       const taskControls = document.createElement("div");
       const taskCheck = document.createElement("button");
       const taskDelete = document.createElement("button");
+      const taskDateAdded = document.createElement("div");
 
       taskTitle.textContent = element.getTitle();
       taskTitle.classList.add("task-title");
@@ -172,14 +178,19 @@ class TodosView {
         task.classList.add("done");
       }
       taskCheck.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><title>check-bold</title><path d="M9,20.42L2.79,14.21L5.62,11.38L9,14.77L18.88,4.88L21.71,7.71L9,20.42Z" /></svg>`;
-      taskDelete.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><title>delete</title><path d="M19,4H15.5L14.5,3H9.5L8.5,4H5V6H19M6,19A2,2 0 0,0 8,21H16A2,2 0 0,0 18,19V7H6V19Z" /></svg>`;
       taskCheck.classList.add("task-check");
+      taskDelete.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><title>delete</title><path d="M19,4H15.5L14.5,3H9.5L8.5,4H5V6H19M6,19A2,2 0 0,0 8,21H16A2,2 0 0,0 18,19V7H6V19Z" /></svg>`;
       taskDelete.classList.add("task-delete");
+
+      taskDateAdded.classList.add("date-added");
+      taskDateAdded.textContent = `Added 
+      ${formatDistanceToNowStrict(element.getDateAdded())} ago`;
 
       taskControls.classList.add("task-controls");
       taskControls.appendChild(taskCheck);
       taskControls.appendChild(taskDelete);
       task.appendChild(taskTitle);
+      task.appendChild(taskDateAdded);
       task.appendChild(taskControls);
       task.setAttribute("data-attribute", `${element.getId()}`);
       this.tasksContainer.appendChild(task);
@@ -258,6 +269,7 @@ document.addEventListener("DOMContentLoaded", () => {
       // Detect current task
       const taskId =
         e.target.parentNode.parentNode.getAttribute("data-attribute");
+
       // Handler - delete task
       if (e.target.classList.contains("task-delete")) {
         currentProject.removeTask(taskId);
