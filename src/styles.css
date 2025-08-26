@@ -225,6 +225,11 @@ button.project-title,
   padding: 0.7rem 1rem;
   cursor: auto;
 }
+
+.task-title {
+  padding: 0 0.5rem;
+}
+
 .task-controls {
   display: flex;
   gap: 1rem;
@@ -260,4 +265,13 @@ button.project-title,
 
 svg {
   pointer-events: none;
+}
+.done {
+  .task-title {
+    text-decoration: line-through;
+    font-style: italic;
+  }
+  .task-check {
+    fill: green;
+  }
 }

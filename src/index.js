@@ -68,6 +68,9 @@ class Project {
   removeTask(id) {
     this.tasks = this.tasks.filter((item) => item.id !== id);
   }
+  getTask(id) {
+    return this.tasks.find((item) => item.id == id);
+  }
 }
 
 class ProjectList {
@@ -163,7 +166,11 @@ class TodosView {
       const taskDelete = document.createElement("button");
 
       taskTitle.textContent = element.getTitle();
+      taskTitle.classList.add("task-title");
       task.classList.add("task");
+      if (element.getDone()) {
+        task.classList.add("done");
+      }
       taskCheck.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><title>check-bold</title><path d="M9,20.42L2.79,14.21L5.62,11.38L9,14.77L18.88,4.88L21.71,7.71L9,20.42Z" /></svg>`;
       taskDelete.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><title>delete</title><path d="M19,4H15.5L14.5,3H9.5L8.5,4H5V6H19M6,19A2,2 0 0,0 8,21H16A2,2 0 0,0 18,19V7H6V19Z" /></svg>`;
       taskCheck.classList.add("task-check");
@@ -191,6 +198,7 @@ const month = new Project("this month");
 projects.addProject(inbox, home, work, week, month);
 
 const task1 = new Task("Do laundry");
+task1.toggleDone();
 const task2 = new Task("Work-out");
 inbox.addTask(task1);
 inbox.addTask(task2);
@@ -250,15 +258,18 @@ document.addEventListener("DOMContentLoaded", () => {
       // Detect current task
       const taskId =
         e.target.parentNode.parentNode.getAttribute("data-attribute");
-      // Handle marking tasks as DONE
+      // Handler - delete task
       if (e.target.classList.contains("task-delete")) {
-        e.preventDefault();
         currentProject.removeTask(taskId);
-
-        // Update Display
-        view = new ProjectView(currentProject);
-        view.displayProject();
       }
+
+      // Handler - mark task as DONE
+      if (e.target.classList.contains("task-check")) {
+        currentProject.getTask(taskId).toggleDone();
+      }
+      // Update Display
+      view = new ProjectView(currentProject);
+      view.displayProject();
     }
   });
 });
