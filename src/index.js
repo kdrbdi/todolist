@@ -1,6 +1,6 @@
 import "./styles.css";
 import { v4 as uuidv4 } from "uuid";
-import { formatDistance } from "date-fns";
+import { add, formatDistance } from "date-fns";
 
 const container = document.createElement("div");
 container.setAttribute("id", "container");
@@ -32,11 +32,25 @@ class Task {
   setNotes(notes) {
     this.notes = notes;
   }
-  // TODO: checkList methods
-
   getDone() {
     return this.done;
   }
+  getTitle() {
+    return this.title;
+  }
+  getDescription() {
+    return this.description;
+  }
+  getDueDate() {
+    return this.dueDate;
+  }
+  getPriority() {
+    return this.priority;
+  }
+  getNotes() {
+    return this.notes;
+  }
+  // TODO: checkList methods
 }
 
 class Project {
@@ -84,13 +98,22 @@ class Sidebar {
     this.sidebar.appendChild(logo);
   }
   createProjects(projectList) {
+    const projectGroup = document.createElement("div");
+    projectGroup.classList.add("project-group");
     projectList.getProjects().forEach((element) => {
       const proj = document.createElement("button");
       proj.classList.add("project-title");
       proj.setAttribute("data-attribute", element.id);
       proj.textContent = element.title;
-      this.sidebar.appendChild(proj);
+      projectGroup.appendChild(proj);
     });
+    this.sidebar.appendChild(projectGroup);
+  }
+  createAddProjectButton() {
+    const addBtn = document.createElement("button");
+    addBtn.setAttribute("id", "btn-add-project");
+    addBtn.textContent = "Add Project";
+    this.sidebar.appendChild(addBtn);
   }
   getSidebar() {
     return this.sidebar;
@@ -105,6 +128,7 @@ class ProjectView {
   displayProject() {
     container.innerHTML = "";
     const projectTitle = document.createElement("div");
+    projectTitle.classList.add("view-title");
     projectTitle.textContent = this.title;
     container.appendChild(projectTitle);
     const todos = new TodosView();
@@ -127,8 +151,20 @@ class TodosView {
     todolist.forEach((element) => {
       const task = document.createElement("div");
       const taskTitle = document.createElement("div");
-      taskTitle.textContent = element.title;
+      const taskControls = document.createElement("div");
+      const taskCheck = document.createElement("div");
+      const taskDelete = document.createElement("div");
+
+      taskTitle.textContent = element.getTitle();
+      task.classList.add("task");
+      taskCheck.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" class="task-check" viewBox="0 0 24 24"><title>check-bold</title><path d="M9,20.42L2.79,14.21L5.62,11.38L9,14.77L18.88,4.88L21.71,7.71L9,20.42Z" /></svg>`;
+      taskDelete.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" class="task-delete" viewBox="0 0 24 24"><title>delete</title><path d="M19,4H15.5L14.5,3H9.5L8.5,4H5V6H19M6,19A2,2 0 0,0 8,21H16A2,2 0 0,0 18,19V7H6V19Z" /></svg>`;
+
+      taskControls.classList.add("task-controls");
+      taskControls.appendChild(taskCheck);
+      taskControls.appendChild(taskDelete);
       task.appendChild(taskTitle);
+      task.appendChild(taskControls);
       this.tasksContainer.appendChild(task);
     });
     return this.tasksContainer;
@@ -163,12 +199,11 @@ const displaySidebar = (() => {
   const sidebar = new Sidebar();
   sidebar.createLogo();
   sidebar.createProjects(projects);
+  sidebar.createAddProjectButton();
   document.body.appendChild(sidebar.getSidebar());
 })();
 
-// const inboxView = new ProjectView(inbox);
-// inboxView.displayProject();
-
+// Sidebar/Projects Handler
 document.querySelector("#sidebar").addEventListener("click", (e) => {
   if (e.target.classList.contains("project-title")) {
     // Mark tab as active (for styling) and remove class from

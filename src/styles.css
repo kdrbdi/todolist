@@ -100,6 +100,7 @@ body {
   padding: 1rem 0.4rem 2rem;
   display: flex;
   flex-direction: column;
+  justify-content: space-between;
 }
 
 #sidebar button {
@@ -111,6 +112,14 @@ body {
   cursor: pointer;
   outline: inherit;
 }
+
+#sidebar .project-group {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: auto;
+  margin-top: 1rem;
+}
+/* 
 #sidebar button.project-title {
   color: var(--link-clr-secondary);
   padding: 0.5rem 1rem;
@@ -121,6 +130,60 @@ body {
 #sidebar button.current-tab {
   color: var(--link-clr-primary);
   font-weight: 600;
+} */
+
+button.project-title {
+  text-transform: capitalize;
+}
+
+#sidebar button#btn-add-project,
+button.project-title,
+.task {
+  align-items: center;
+  background-color: #ffffff;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  border-radius: 0.25rem;
+  box-shadow: rgba(0, 0, 0, 0.02) 0 1px 3px 0;
+  box-sizing: border-box;
+  color: rgba(0, 0, 0, 0.85);
+  cursor: pointer;
+  display: inline-flex;
+  font-family: system-ui, -apple-system, system-ui, "Helvetica Neue", Helvetica,
+    Arial, sans-serif;
+  font-size: 16px;
+  font-weight: 600;
+  justify-content: center;
+  line-height: 1.25;
+  margin: 0;
+  min-height: 3rem;
+  padding: calc(0.875rem - 1px) calc(1.5rem - 1px);
+  position: relative;
+  text-decoration: none;
+  transition: all 250ms;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: manipulation;
+  vertical-align: baseline;
+  width: auto;
+
+  &:hover,
+  &:focus {
+    border-color: rgba(0, 0, 0, 0.15);
+    box-shadow: rgba(0, 0, 0, 0.1) 0 4px 12px;
+    color: rgba(0, 0, 0, 0.65);
+  }
+
+  &:hover {
+    transform: translateY(-1px);
+  }
+
+  &:active {
+    background-color: #f0f0f1;
+    border-color: rgba(0, 0, 0, 0.15);
+    box-shadow: rgba(0, 0, 0, 0.06) 0 2px 4px;
+    color: rgba(0, 0, 0, 0.65);
+    transform: translateY(0);
+  }
 }
 
 .logo {
@@ -137,9 +200,47 @@ body {
 
 #container {
   width: 100%;
-  padding: 1rem 2rem;
+  padding: 3rem 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.view-title {
+  font-size: 1.2rem;
+  text-transform: capitalize;
 }
 
 #container-tasks {
-  padding: 1rem;
+  padding: 2rem 1rem;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 0.4rem;
+}
+
+.task {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.7rem 1rem;
+  cursor: auto;
+}
+.task-controls {
+  display: flex;
+  gap: 1rem;
+}
+.task .task-check,
+.task .task-delete {
+  fill: rgba(0, 0, 0, 0.75);
+  width: 1.5rem;
+  height: 1.5rem;
+
+  &:hover {
+    cursor: pointer;
+    fill: green;
+  }
+}
+
+.task .task-delete:hover {
+  fill: red;
 }
