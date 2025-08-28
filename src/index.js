@@ -220,33 +220,67 @@ class TodosView {
 }
 
 // Sidebar
-const projects = new ProjectList();
-const inbox = new Project("inbox");
-const home = new Project("home");
-const work = new Project("work");
-const week = new Project("this week");
-const month = new Project("this month");
-projects.addProject(inbox, home, work, week, month);
+// const projects = new ProjectList();
+// const inbox = new Project("inbox");
+// const home = new Project("home");
+// const work = new Project("work");
+// const week = new Project("this week");
+// const month = new Project("this month");
+// projects.addProject(inbox, home, work, week, month);
 
-const task1 = new Task("Do laundry");
-task1.toggleDone();
-const task2 = new Task("Work-out");
-inbox.addTask(task1);
-inbox.addTask(task2);
+// const task1 = new Task("Do laundry");
+// task1.toggleDone();
+// const task2 = new Task("Work-out");
+// inbox.addTask(task1);
+// inbox.addTask(task2);
 
-const task3 = new Task("Do X");
-const task4 = new Task("Do Y");
-home.addTask(task3);
-home.addTask(task4);
+// const task3 = new Task("Do X");
+// const task4 = new Task("Do Y");
+// home.addTask(task3);
+// home.addTask(task4);
 
-const task5 = new Task("Do A");
-const task6 = new Task("Do B");
-work.addTask(task5);
-work.addTask(task6);
+// const task5 = new Task("Do A");
+// const task6 = new Task("Do B");
+// work.addTask(task5);
+// work.addTask(task6);
+
+// localStorage
+
+function populateStorage() {
+  const projects = new ProjectList();
+  const inbox = new Project("inbox");
+  projects.addProject(inbox);
+  localStorage.setItem("projects", JSON.stringify(projects.getProjects()));
+  localStorage.setItem("inbox", JSON.stringify(inbox));
+}
+
+populateStorage();
+
+// Reconstruct Project list
+const projects = (() => {
+  const retrievedProjList = localStorage.getItem("projects");
+  if (retrievedProjList) {
+    const retrievedData = JSON.parse(retrievedProjList);
+    console.log(retrievedProjList);
+    const reconstructedProjList = new ProjectList();
+    for (let project of retrievedData) {
+      reconstructedProjList.addProject(project);
+    }
+    console.log(reconstructedProjList);
+    return reconstructedProjList;
+  }
+})();
+
+// Reconstruct projects individually
+
+const inbox = JSON.parse(localStorage.getItem("inbox"));
+console.log("projects reconstructed", projects);
+console.log(inbox);
 
 const displaySidebar = (() => {
   const sidebar = new Sidebar();
   sidebar.createLogo();
+  // sidebar.createProjects(projects);
   sidebar.createProjects(projects);
   sidebar.createAddProjectButton();
   document.body.appendChild(sidebar.getSidebar());
