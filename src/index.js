@@ -87,6 +87,9 @@ class ProjectList {
   getProject(id) {
     return this.#projects.find((item) => item.id == id);
   }
+  getDefaultProject() {
+    return this.#projects[0];
+  }
   addProject(...project) {
     this.#projects.push(...project);
   }
@@ -249,33 +252,45 @@ class TodosView {
 function populateStorage() {
   const projects = new ProjectList();
   const inbox = new Project("inbox");
+  const task = new Task("Do Laundry");
+  inbox.addTask(task);
   projects.addProject(inbox);
   localStorage.setItem("projects", JSON.stringify(projects.getProjects()));
-  localStorage.setItem("inbox", JSON.stringify(inbox));
 }
 
 populateStorage();
 
-// Reconstruct Project list
+// Reconstruct Project list recursively (ProjectList -> Project -> Tasks)
 const projects = (() => {
   const retrievedProjList = localStorage.getItem("projects");
   if (retrievedProjList) {
     const retrievedData = JSON.parse(retrievedProjList);
-    console.log(retrievedProjList);
     const reconstructedProjList = new ProjectList();
     for (let project of retrievedData) {
-      reconstructedProjList.addProject(project);
+      console.log(project.tasks);
+      let tempProj = new Project(project.title);
+      project.tasks.forEach((item) => {
+        console.log(item);
+        let tempTask = new Task(
+          item.title,
+          item.description,
+          item.dueDate,
+          item.priority,
+          item.notes,
+          item.checkList
+        );
+        console.log("temp task", tempTask);
+        tempProj.addTask(tempTask);
+      });
+      console.log(tempProj);
+      reconstructedProjList.addProject(tempProj);
     }
     console.log(reconstructedProjList);
     return reconstructedProjList;
   }
 })();
 
-// Reconstruct projects individually
-
-const inbox = JSON.parse(localStorage.getItem("inbox"));
-console.log("projects reconstructed", projects);
-console.log(inbox);
+console.log("projects", projects);
 
 const displaySidebar = (() => {
   const sidebar = new Sidebar();
@@ -287,7 +302,8 @@ const displaySidebar = (() => {
 })();
 
 // Render default project on load
-const defaultProject = inbox;
+// const defaultProject = inbox;
+const defaultProject = projects.getDefaultProject();
 document.addEventListener("DOMContentLoaded", () => {
   let view = new ProjectView(defaultProject);
   view.displayProject();
@@ -313,9 +329,10 @@ document.addEventListener("DOMContentLoaded", () => {
       const project = projects
         .getProjects()
         .find((item) => item.id == e.target.getAttribute("data-attribute"));
+      console.log("here", project);
       currentProject = project;
-      console.log("current project", project);
-      updateDisplay(project);
+      console.log("current project", currentProject);
+      updateDisplay(currentProject);
     }
   });
 
@@ -347,6 +364,7 @@ document.addEventListener("DOMContentLoaded", () => {
       console.log("current project tasks", currentProject.tasks);
       console.log("input value", inputValue);
       const addedTask = new Task(inputValue);
+      console.log(addedTask);
       currentProject.addTaskToTop(addedTask);
       console.log("current project AFTER", currentProject);
       console.log("current project tasks AFTER", currentProject.tasks);
