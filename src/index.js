@@ -68,6 +68,9 @@ class Project {
   addTask(task) {
     this.tasks.push(task);
   }
+  addTaskToTop(task) {
+    this.tasks.unshift(task);
+  }
   removeTask(id) {
     this.tasks = this.tasks.filter((item) => item.id !== id);
   }
@@ -158,11 +161,28 @@ class TodosView {
     this.tasksContainer = document.createElement("div");
     this.tasksContainer.setAttribute("id", "container-tasks");
   }
-  displayTodosInline(todolist) {
-    // If container already exists, clear it.
+  displayTaskForm() {
     if (document.querySelector("#container-tasks")) {
       document.querySelector("#container-tasks").innerHTML = "";
     }
+    const inputWrapper = document.createElement("div");
+    const input = document.createElement("input");
+    const btnSubmit = document.createElement("button");
+
+    inputWrapper.classList.add("input-wrapper");
+    input.setAttribute("type", "text");
+    input.setAttribute("placeholder", "Add a task");
+    btnSubmit.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><title>plus-circle</title><path d="M17,13H13V17H11V13H7V11H11V7H13V11H17M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2Z" /></svg>`;
+    btnSubmit.classList.add("btn-add-task");
+
+    inputWrapper.appendChild(input);
+    inputWrapper.appendChild(btnSubmit);
+
+    this.tasksContainer.appendChild(inputWrapper);
+  }
+  displayTodosInline(todolist) {
+    this.displayTaskForm();
+    // If container already exists, clear it.
     todolist.forEach((element) => {
       const task = document.createElement("div");
       const taskTitle = document.createElement("div");
@@ -239,6 +259,11 @@ document.addEventListener("DOMContentLoaded", () => {
   view.displayProject();
   let currentProject = defaultProject;
 
+  function updateDisplay(proj) {
+    view = new ProjectView(proj);
+    view.displayProject();
+  }
+
   // Sidebar/Projects Handler
   document.querySelector("#sidebar").addEventListener("click", (e) => {
     if (e.target.classList.contains("project-title")) {
@@ -256,8 +281,7 @@ document.addEventListener("DOMContentLoaded", () => {
         .find((item) => item.id == e.target.getAttribute("data-attribute"));
       currentProject = project;
       console.log("current project", project);
-      const view = new ProjectView(project);
-      view.displayProject();
+      updateDisplay(project);
     }
   });
 
@@ -279,9 +303,27 @@ document.addEventListener("DOMContentLoaded", () => {
       if (e.target.classList.contains("task-check")) {
         currentProject.getTask(taskId).toggleDone();
       }
-      // Update Display
-      view = new ProjectView(currentProject);
-      view.displayProject();
+
+      updateDisplay(currentProject);
+    }
+    if (e.target.classList.contains("btn-add-task")) {
+      const input = document.querySelector(".input-wrapper input");
+      const inputValue = input.value;
+      console.log("current project", currentProject);
+      console.log("current project tasks", currentProject.tasks);
+      console.log("input value", inputValue);
+      const addedTask = new Task(inputValue);
+      currentProject.addTaskToTop(addedTask);
+      console.log("current project AFTER", currentProject);
+      console.log("current project tasks AFTER", currentProject.tasks);
+      updateDisplay(currentProject);
+    }
+  });
+  document.body.addEventListener("keydown", function (e) {
+    if (e.target.closest(".input-wrapper")) {
+      if (e.key === "Enter") {
+        document.querySelector(".btn-add-task").click();
+      }
     }
   });
 });

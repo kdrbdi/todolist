@@ -138,7 +138,8 @@ button.project-title {
 
 #sidebar button#btn-add-project,
 button.project-title,
-.task {
+.task,
+.input-wrapper input {
   align-items: center;
   background-color: #ffffff;
   border: 1px solid rgba(0, 0, 0, 0.1);
@@ -281,4 +282,26 @@ svg {
   font-size: 0.75rem;
   font-weight: 300;
   padding: 0 0.5rem;
+}
+
+.input-wrapper {
+  position: relative;
+  display: inline-block;
+}
+
+.input-wrapper input {
+  width: 100%;
+  padding-right: 40px;
+  cursor: auto;
+}
+
+.input-wrapper button {
+  position: absolute;
+  top: 0;
+  right: 0;
+  border: none;
+  background-color: transparent;
+  cursor: pointer;
+  width: 2.5rem;
+  height: 2.5rem;
 }
