@@ -134,10 +134,12 @@ class Sidebar {
       projectGroup.appendChild(proj);
     });
     this.sidebar.appendChild(projectGroup);
+    return projectGroup;
   }
   createAddProjectButton() {
     const addBtn = document.createElement("button");
     addBtn.setAttribute("id", "btn-add-project");
+    addBtn.classList.add("btn-project");
     addBtn.textContent = "Add Project";
     this.sidebar.appendChild(addBtn);
   }
@@ -193,41 +195,70 @@ class TodosView {
   }
   displayTodosInline(todolist) {
     this.displayTaskForm();
-    // If container already exists, clear it.
-    todolist.forEach((element) => {
-      const task = document.createElement("div");
-      const taskTitle = document.createElement("div");
-      const taskControls = document.createElement("div");
-      const taskCheck = document.createElement("button");
-      const taskDelete = document.createElement("button");
-      const taskDateAdded = document.createElement("div");
+    if (todolist) {
+      todolist.forEach((element) => {
+        const task = document.createElement("div");
+        const taskTitle = document.createElement("div");
+        const taskControls = document.createElement("div");
+        const taskCheck = document.createElement("button");
+        const taskDelete = document.createElement("button");
+        const taskDateAdded = document.createElement("div");
 
-      taskTitle.textContent = element.getTitle();
-      taskTitle.classList.add("task-title");
-      task.classList.add("task");
-      if (element.getDone()) {
-        task.classList.add("done");
-      }
-      taskCheck.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><title>check-bold</title><path d="M9,20.42L2.79,14.21L5.62,11.38L9,14.77L18.88,4.88L21.71,7.71L9,20.42Z" /></svg>`;
-      taskCheck.classList.add("task-check");
-      taskDelete.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><title>delete</title><path d="M19,4H15.5L14.5,3H9.5L8.5,4H5V6H19M6,19A2,2 0 0,0 8,21H16A2,2 0 0,0 18,19V7H6V19Z" /></svg>`;
-      taskDelete.classList.add("task-delete");
+        taskTitle.textContent = element.getTitle();
+        taskTitle.classList.add("task-title");
+        task.classList.add("task");
+        if (element.getDone()) {
+          task.classList.add("done");
+        }
+        taskCheck.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><title>check-bold</title><path d="M9,20.42L2.79,14.21L5.62,11.38L9,14.77L18.88,4.88L21.71,7.71L9,20.42Z" /></svg>`;
+        taskCheck.classList.add("task-check");
+        taskDelete.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><title>delete</title><path d="M19,4H15.5L14.5,3H9.5L8.5,4H5V6H19M6,19A2,2 0 0,0 8,21H16A2,2 0 0,0 18,19V7H6V19Z" /></svg>`;
+        taskDelete.classList.add("task-delete");
 
-      taskDateAdded.classList.add("date-added");
-      taskDateAdded.textContent = `Added 
-      ${formatDistanceToNowStrict(element.getDateAdded())} ago`;
+        taskDateAdded.classList.add("date-added");
+        taskDateAdded.textContent = `Added 
+        ${formatDistanceToNowStrict(element.getDateAdded())} ago`;
 
-      taskControls.classList.add("task-controls");
-      taskControls.appendChild(taskCheck);
-      taskControls.appendChild(taskDelete);
-      task.appendChild(taskTitle);
-      task.appendChild(taskDateAdded);
-      task.appendChild(taskControls);
-      task.setAttribute("data-attribute", `${element.getId()}`);
-      this.tasksContainer.appendChild(task);
-    });
+        taskControls.classList.add("task-controls");
+        taskControls.appendChild(taskCheck);
+        taskControls.appendChild(taskDelete);
+        task.appendChild(taskTitle);
+        task.appendChild(taskDateAdded);
+        task.appendChild(taskControls);
+        task.setAttribute("data-attribute", `${element.getId()}`);
+        this.tasksContainer.appendChild(task);
+      });
+    }
     return this.tasksContainer;
   }
+}
+
+function createProjectModal() {
+  const modal = document.createElement("dialog");
+  const modalTitle = document.createElement("p");
+  const input = document.createElement("input");
+  const btnSubmit = document.createElement("button");
+  const btnClose = document.createElement("button");
+
+  modal.classList.add("modal");
+  modal.classList.add("modal-project");
+  modalTitle.classList.add("modal-title");
+  modalTitle.innerText = "Project title";
+  input.setAttribute("type", "text");
+  input.classList.add("modal-input");
+  input.setAttribute("required", "");
+  btnSubmit.innerText = "Submit";
+  btnSubmit.classList.add("btn-submit-project");
+  btnClose.innerText = "Close";
+  btnClose.classList.add("btn-close-modal");
+
+  modal.appendChild(modalTitle);
+  modal.appendChild(input);
+  modal.appendChild(btnSubmit);
+  modal.appendChild(btnClose);
+
+  document.body.appendChild(modal);
+  return modal;
 }
 
 // localStorage
@@ -278,24 +309,35 @@ function saveProjects(projects) {
 const displaySidebar = (() => {
   const sidebar = new Sidebar();
   sidebar.createLogo();
-  // sidebar.createProjects(projects);
   sidebar.createProjects(projects);
   sidebar.createAddProjectButton();
   document.body.appendChild(sidebar.getSidebar());
+
+  function updateSidebarProjects(newProjects) {
+    const oldProjectsList = document.querySelector(".project-group");
+    const newProjectsList = sidebar.createProjects(newProjects);
+    document
+      .querySelector("#sidebar")
+      .replaceChild(newProjectsList, oldProjectsList);
+  }
+  return { updateSidebarProjects };
 })();
 
 // Render default project on load
-// const defaultProject = inbox;
 const defaultProject = projects.getDefaultProject();
-document.addEventListener("DOMContentLoaded", () => {
-  let view = new ProjectView(defaultProject);
-  view.displayProject();
-  let currentProject = defaultProject;
+let currentProject = defaultProject;
+const modal = createProjectModal();
 
-  function updateDisplay(proj) {
-    view = new ProjectView(proj);
-    view.displayProject();
-  }
+// Helper - update display of projects
+function updateDisplay(proj) {
+  let view = new ProjectView(proj);
+  view.displayProject();
+
+  return view;
+}
+
+document.addEventListener("DOMContentLoaded", (e) => {
+  let view = updateDisplay(defaultProject);
 
   // Sidebar/Projects Handler
   document.querySelector("#sidebar").addEventListener("click", (e) => {
@@ -318,52 +360,87 @@ document.addEventListener("DOMContentLoaded", () => {
       updateDisplay(currentProject);
     }
   });
+});
 
-  // Task controls handler
-  document.body.addEventListener("click", (e) => {
-    console.log("event fired", e.target);
+// Clicks handler
+document.body.addEventListener("click", (e) => {
+  console.log("event fired", e.target);
 
-    if (e.target.closest(".task-controls")) {
-      // Detect current task
-      const taskId =
-        e.target.parentNode.parentNode.getAttribute("data-attribute");
+  if (e.target.closest(".task-controls")) {
+    // Detect current task
+    const taskId =
+      e.target.parentNode.parentNode.getAttribute("data-attribute");
 
-      // Handler - delete task
-      if (e.target.classList.contains("task-delete")) {
-        currentProject.removeTask(taskId);
+    // Handler - delete task
+    if (e.target.classList.contains("task-delete")) {
+      currentProject.removeTask(taskId);
+    }
+
+    // Handler - mark task as DONE
+    if (e.target.classList.contains("task-check")) {
+      currentProject.getTask(taskId).toggleDone();
+    }
+
+    saveProjects(projects);
+    updateDisplay(currentProject);
+  }
+  if (e.target.classList.contains("btn-add-task")) {
+    const input = document.querySelector(".input-wrapper input");
+    const inputValue = input.value;
+    console.log("current project", currentProject);
+    console.log("current project tasks", currentProject.tasks);
+    console.log("input value", inputValue);
+    const addedTask = new Task(inputValue);
+    console.log(addedTask);
+    currentProject.addTaskToTop(addedTask);
+    console.log("current project AFTER", currentProject);
+    console.log("current project tasks AFTER", currentProject.tasks);
+    // Update localStorage
+    saveProjects(projects);
+    updateDisplay(currentProject);
+  }
+
+  // Handle Add project modal
+  if (e.target.classList.contains("btn-project")) {
+    modal.showModal();
+  }
+  // Handle modal controls
+  if (e.target.closest(".modal")) {
+    if (e.target.classList.contains("btn-submit-project")) {
+      const addedProjTitle = document.querySelector(
+        ".modal .modal-input"
+      ).value;
+      if (addedProjTitle) {
+        const addedProj = new Project(addedProjTitle);
+        projects.addProject(addedProj);
+        currentProject = addedProj;
         saveProjects(projects);
+        updateDisplay(currentProject);
+        document.querySelector(".modal .modal-input").value = "";
+        displaySidebar.updateSidebarProjects(projects);
       }
+    }
+  }
+  document
+    .querySelector(".modal .btn-close-modal")
+    .addEventListener("click", () => {
+      modal.close();
+    });
+  console.log("I want to add project");
+});
 
-      // Handler - mark task as DONE
-      if (e.target.classList.contains("task-check")) {
-        currentProject.getTask(taskId).toggleDone();
-        saveProjects(projects);
-      }
-
-      saveProjects(projects);
-      updateDisplay(currentProject);
+document.body.addEventListener("keydown", function (e) {
+  if (e.target.closest(".input-wrapper")) {
+    if (e.key === "Enter") {
+      document.querySelector(".btn-add-task").click();
     }
-    if (e.target.classList.contains("btn-add-task")) {
-      const input = document.querySelector(".input-wrapper input");
-      const inputValue = input.value;
-      console.log("current project", currentProject);
-      console.log("current project tasks", currentProject.tasks);
-      console.log("input value", inputValue);
-      const addedTask = new Task(inputValue);
-      console.log(addedTask);
-      currentProject.addTaskToTop(addedTask);
-      console.log("current project AFTER", currentProject);
-      console.log("current project tasks AFTER", currentProject.tasks);
-      // Update localStorage
-      saveProjects(projects);
-      updateDisplay(currentProject);
+  }
+  if (e.target.closest(".modal")) {
+    console.log("inside modal");
+    if (e.key === "Enter") {
+      document.querySelector(".btn-submit-project").click();
+      document.querySelector(".modal-project").close();
+      // document.querySelector(".modal").close();
     }
-  });
-  document.body.addEventListener("keydown", function (e) {
-    if (e.target.closest(".input-wrapper")) {
-      if (e.key === "Enter") {
-        document.querySelector(".btn-add-task").click();
-      }
-    }
-  });
+  }
 });
