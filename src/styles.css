@@ -192,6 +192,9 @@ button.project-title,
 
 .logo {
   display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.245rem;
 }
 
 .icon-logo {
@@ -200,6 +203,11 @@ button.project-title,
   background-image: url("./fire-circle.svg");
   background-repeat: no-repeat;
   background-size: contain;
+}
+.logo-title {
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 2px;
 }
 
 #container {
@@ -300,13 +308,18 @@ svg {
 
 .input-wrapper button {
   position: absolute;
-  top: 0;
-  right: 0;
+  top: 0.2rem;
+  right: 0.7rem;
   border: none;
   background-color: transparent;
   cursor: pointer;
   width: 2.5rem;
   height: 2.5rem;
+  fill: rgba(0, 0, 0, 0.75);
+  &:hover {
+    fill: green;
+    transform: translateY(-1px);
+  }
 }
 
 dialog {

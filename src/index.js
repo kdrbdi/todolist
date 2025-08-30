@@ -117,6 +117,7 @@ class Sidebar {
     const logoTitle = document.createElement("div");
     const logoIcon = document.createElement("div");
     logoTitle.textContent = "2dos";
+    logoTitle.classList.add("logo-title");
     logoIcon.classList.add("icon-logo");
     logo.appendChild(logoIcon);
     logo.appendChild(logoTitle);
