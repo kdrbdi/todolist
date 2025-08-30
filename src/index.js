@@ -230,31 +230,6 @@ class TodosView {
   }
 }
 
-// Sidebar
-// const projects = new ProjectList();
-// const inbox = new Project("inbox");
-// const home = new Project("home");
-// const work = new Project("work");
-// const week = new Project("this week");
-// const month = new Project("this month");
-// projects.addProject(inbox, home, work, week, month);
-
-// const task1 = new Task("Do laundry");
-// task1.toggleDone();
-// const task2 = new Task("Work-out");
-// inbox.addTask(task1);
-// inbox.addTask(task2);
-
-// const task3 = new Task("Do X");
-// const task4 = new Task("Do Y");
-// home.addTask(task3);
-// home.addTask(task4);
-
-// const task5 = new Task("Do A");
-// const task6 = new Task("Do B");
-// work.addTask(task5);
-// work.addTask(task6);
-
 // localStorage
 
 // Reconstruct Project list recursively (ProjectList -> Project -> Tasks)
@@ -267,6 +242,7 @@ const projects = (() => {
     inbox.addTask(task);
     projects.addProject(inbox);
     localStorage.setItem("projects", JSON.stringify(projects.getProjects()));
+    return projects;
   } else {
     const retrievedData = JSON.parse(retrievedProjList);
     const reconstructedProjList = new ProjectList();
