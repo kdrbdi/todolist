@@ -6,7 +6,15 @@ const container = document.createElement("div");
 container.setAttribute("id", "container");
 
 class Task {
-  constructor(title, description, dueDate, priority, notes, checkList) {
+  constructor(
+    title,
+    done = false,
+    description,
+    dueDate,
+    priority,
+    notes,
+    checkList
+  ) {
     this.id = uuidv4();
     this.title = title;
     this.description = description;
@@ -14,7 +22,7 @@ class Task {
     this.priority = priority;
     this.notes = notes;
     this.checkList = [];
-    this.done = false;
+    this.done = done;
     this.dateAdded = new Date();
   }
   toggleDone() {
@@ -249,21 +257,17 @@ class TodosView {
 
 // localStorage
 
-function populateStorage() {
-  const projects = new ProjectList();
-  const inbox = new Project("inbox");
-  const task = new Task("Do Laundry");
-  inbox.addTask(task);
-  projects.addProject(inbox);
-  localStorage.setItem("projects", JSON.stringify(projects.getProjects()));
-}
-
-populateStorage();
-
 // Reconstruct Project list recursively (ProjectList -> Project -> Tasks)
 const projects = (() => {
   const retrievedProjList = localStorage.getItem("projects");
-  if (retrievedProjList) {
+  if (!retrievedProjList) {
+    const projects = new ProjectList();
+    const inbox = new Project("inbox");
+    const task = new Task("Do Laundry");
+    inbox.addTask(task);
+    projects.addProject(inbox);
+    localStorage.setItem("projects", JSON.stringify(projects.getProjects()));
+  } else {
     const retrievedData = JSON.parse(retrievedProjList);
     const reconstructedProjList = new ProjectList();
     for (let project of retrievedData) {
@@ -273,6 +277,7 @@ const projects = (() => {
         console.log(item);
         let tempTask = new Task(
           item.title,
+          item.done,
           item.description,
           item.dueDate,
           item.priority,
@@ -290,7 +295,9 @@ const projects = (() => {
   }
 })();
 
-console.log("projects", projects);
+function saveProjects(projects) {
+  localStorage.setItem(`projects`, JSON.stringify(projects.getProjects()));
+}
 
 const displaySidebar = (() => {
   const sidebar = new Sidebar();
@@ -348,13 +355,16 @@ document.addEventListener("DOMContentLoaded", () => {
       // Handler - delete task
       if (e.target.classList.contains("task-delete")) {
         currentProject.removeTask(taskId);
+        saveProjects(projects);
       }
 
       // Handler - mark task as DONE
       if (e.target.classList.contains("task-check")) {
         currentProject.getTask(taskId).toggleDone();
+        saveProjects(projects);
       }
 
+      saveProjects(projects);
       updateDisplay(currentProject);
     }
     if (e.target.classList.contains("btn-add-task")) {
@@ -368,6 +378,8 @@ document.addEventListener("DOMContentLoaded", () => {
       currentProject.addTaskToTop(addedTask);
       console.log("current project AFTER", currentProject);
       console.log("current project tasks AFTER", currentProject.tasks);
+      // Update localStorage
+      saveProjects(projects);
       updateDisplay(currentProject);
     }
   });
