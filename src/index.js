@@ -1,6 +1,6 @@
 import "./styles.css";
 import { v4 as uuidv4 } from "uuid";
-import { add, formatDistanceToNowStrict } from "date-fns";
+import { add, formatDistanceToNowStrict, format } from "date-fns";
 
 const container = document.createElement("div");
 container.setAttribute("id", "container");
@@ -186,6 +186,7 @@ class TodosView {
     inputWrapper.classList.add("input-wrapper");
     input.setAttribute("type", "text");
     input.setAttribute("placeholder", "Add a task");
+    input.setAttribute("autofocus", "");
     btnSubmit.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><title>plus-circle</title><path d="M17,13H13V17H11V13H7V11H11V7H13V11H17M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2Z" /></svg>`;
     btnSubmit.classList.add("btn-add-task");
 
@@ -203,6 +204,7 @@ class TodosView {
         const taskControls = document.createElement("div");
         const taskCheck = document.createElement("button");
         const taskDelete = document.createElement("button");
+        const taskEdit = document.createElement("button");
         const taskDateAdded = document.createElement("div");
 
         taskTitle.textContent = element.getTitle();
@@ -215,6 +217,8 @@ class TodosView {
         taskCheck.classList.add("task-check");
         taskDelete.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><title>delete</title><path d="M19,4H15.5L14.5,3H9.5L8.5,4H5V6H19M6,19A2,2 0 0,0 8,21H16A2,2 0 0,0 18,19V7H6V19Z" /></svg>`;
         taskDelete.classList.add("task-delete");
+        taskEdit.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><title>dots-vertical</title><path d="M12,16A2,2 0 0,1 14,18A2,2 0 0,1 12,20A2,2 0 0,1 10,18A2,2 0 0,1 12,16M12,10A2,2 0 0,1 14,12A2,2 0 0,1 12,14A2,2 0 0,1 10,12A2,2 0 0,1 12,10M12,4A2,2 0 0,1 14,6A2,2 0 0,1 12,8A2,2 0 0,1 10,6A2,2 0 0,1 12,4Z" /></svg>`;
+        taskEdit.classList.add("task-edit");
 
         taskDateAdded.classList.add("date-added");
         taskDateAdded.textContent = `Added 
@@ -223,6 +227,8 @@ class TodosView {
         taskControls.classList.add("task-controls");
         taskControls.appendChild(taskCheck);
         taskControls.appendChild(taskDelete);
+        taskControls.appendChild(taskEdit);
+
         task.appendChild(taskTitle);
         task.appendChild(taskDateAdded);
         task.appendChild(taskControls);
@@ -231,6 +237,60 @@ class TodosView {
       });
     }
     return this.tasksContainer;
+  }
+}
+
+class TaskModal {
+  constructor(task) {
+    this.task = task;
+  }
+  createTaskModal() {
+    const taskModal = document.createElement("dialog");
+    const taskInfo = document.createElement("div");
+    const taskTitle = document.createElement("div");
+    const taskCreatedDate = document.createElement("div");
+    const notes = document.createElement("textarea");
+    const descriptionContainer = document.createElement("div");
+    const descriptionInput = document.createElement("input");
+
+    // Task status
+    const statusDiv = document.createElement("div");
+    const statusTitle = document.createElement("div");
+    const statusDone = document.createElement("div");
+
+    // Checklist
+    const checkListContainer = document.createElement("div");
+    const checkListTitle = document.createElement("div");
+    const checkListItems = document.createElement("div");
+
+    // Controls
+    const btnValidate = document.createElement("button");
+    const btnClose = document.createElement("button");
+
+    taskTitle.innerText = this.task.getTitle();
+    const parsedDate = Date.parse(this.task.getDateAdded());
+    const formattedDate = format(parsedDate, "EEEE hh:mm dd/MM/yyyy");
+    taskCreatedDate.innerText = formattedDate;
+
+    notes.innerText = (() => {
+      if (this.task.getNotes()) {
+        return this.task.getNotes();
+      } else {
+        notes.setAttribute("placeholder", "Start writing your notes..");
+        return "";
+      }
+    })();
+
+    taskModal.classList.add("modal");
+    taskModal.classList.add("modal-task");
+    taskCreatedDate.classList.add("date-created");
+
+    taskModal.appendChild(taskTitle);
+    taskModal.appendChild(taskCreatedDate);
+    taskModal.appendChild(notes);
+
+    document.body.appendChild(taskModal);
+    return taskModal;
   }
 }
 
@@ -382,6 +442,16 @@ document.body.addEventListener("click", (e) => {
       currentProject.getTask(taskId).toggleDone();
     }
 
+    // Handler - Edit task
+    if (e.target.classList.contains("task-edit")) {
+      console.log("Edit task");
+      console.log("task to edit", currentProject.getTask(taskId));
+      const taskModal = new TaskModal(currentProject.getTask(taskId));
+      const taskMod = taskModal.createTaskModal();
+      console.log(taskModal);
+      taskMod.showModal();
+    }
+
     saveProjects(projects);
     updateDisplay(currentProject);
   }
@@ -427,7 +497,6 @@ document.body.addEventListener("click", (e) => {
     .addEventListener("click", () => {
       modal.close();
     });
-  console.log("I want to add project");
 });
 
 document.body.addEventListener("keydown", function (e) {

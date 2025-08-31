@@ -179,6 +179,7 @@ button.project-title,
 
   &:hover {
     transform: translateY(-1px);
+    transform: scale(1.02);
   }
 
   &:active {
@@ -260,23 +261,33 @@ button.project-title,
   appearance: none; /* Standard property for removing default button appearance */
 }
 .task .task-check,
-.task .task-delete {
+.task .task-delete,
+.task .task-edit {
   fill: rgba(0, 0, 0, 0.75);
-  width: 1.5rem;
-  height: 1.5rem;
-
-  &:hover {
-    cursor: pointer;
-    fill: green;
-  }
+  padding: 0.125rem;
+  width: 1.765rem;
+  height: 1.765rem;
+  border-radius: 50%;
+}
+.task-check:hover {
+  cursor: pointer;
+  fill: green;
 }
 
 .task .task-delete:hover {
   fill: red;
 }
 
+.task-edit:hover {
+  fill: black;
+}
+
 svg {
   pointer-events: none;
+}
+
+.task-controls button:hover {
+  background-color: rgba(0, 0, 0, 0.1);
 }
 .done {
   .task-title {
